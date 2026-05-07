@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOLF LABS | Homework App</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { bgDark: '#0B0F19', panelDark: '#111827', panelHover: '#1E293B', textLight: '#F8FAFC', textMuted: '#94A3B8', accentCyan: '#00F0FF', accentAmber: '#FFB000', dangerRed: '#EF4444' },
+                    fontFamily: { heading: ['Space Grotesk', 'sans-serif'], body: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #05080E; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: 'Inter', sans-serif; }
+        #phone-frame { width: 375px; height: 812px; background: #0B0F19; border-radius: 40px; border: 12px solid #000; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,240,255,0.15); }
+        .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 30px; background: #000; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 50; }
+        .fade-in { animation: fadeIn 0.3s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        /* Confetti */
+        .confetti { position: absolute; width: 8px; height: 8px; background-color: #00F0FF; opacity: 0; }
+        @keyframes fall { 0% { opacity: 1; transform: translateY(-50px) rotate(0deg); } 100% { opacity: 0; transform: translateY(800px) rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="phone-frame">
+        <div class="notch"></div>
+        
+        <!-- UI Header -->
+        <header class="pt-12 pb-4 px-6 bg-panelDark border-b border-panelHover flex justify-between items-center z-40 relative">
+            <div class="font-heading font-bold text-accentCyan text-sm tracking-widest">WOLF<span class="text-textLight">HW</span></div>
+            <div class="text-xs font-mono text-textMuted" id="q-counter">Q 1/15</div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="h-1 bg-bgDark w-full">
+            <div id="progress-bar" class="h-full bg-accentCyan transition-all duration-300 shadow-[0_0_8px_rgba(0,240,255,0.5)]" style="width: 0%"></div>
+        </div>
+
+        <!-- Main Content -->
+        <main id="app-content" class="p-6 h-[calc(100%-100px)] overflow-y-auto relative text-textLight">
+            <!-- Start Screen -->
+            <div id="screen-start" class="flex flex-col items-center justify-center h-full text-center fade-in">
+                <i class="fa-solid fa-satellite-dish text-7xl text-accentCyan mb-6" style="text-shadow: 0 0 20px rgba(0,240,255,0.5);"></i>
+                <h1 class="font-heading text-4xl font-black mb-2 uppercase tracking-widest">Artemis II</h1>
+                <p class="text-textMuted mb-10 text-sm">Homework Module B1<br>Present Perfect vs Past Simple</p>
+                <button onclick="startQuiz()" class="bg-accentCyan/20 text-accentCyan border border-accentCyan w-full py-4 rounded-xl font-bold font-heading tracking-widest uppercase text-lg shadow-lg hover:bg-accentCyan hover:text-bgDark transition-colors">INITIALIZE SIGNAL</button>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="screen-quiz" class="hidden flex-col h-full fade-in">
+                <div class="flex-1 flex flex-col justify-center">
+                    <p id="question-text" class="font-body text-2xl font-bold mb-8 text-center leading-snug"></p>
+                    <div id="options-container" class="flex flex-col gap-4">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="screen-result" class="hidden flex-col items-center justify-center h-full text-center fade-in z-10 relative">
+                <div id="rank-icon" class="text-7xl mb-4 text-accentCyan" style="text-shadow: 0 0 20px rgba(0,240,255,0.4);"></div>
+                <h2 class="font-heading text-5xl font-black mb-2 text-textLight" id="final-score"></h2>
+                <p class="text-textMuted font-mono mb-8 uppercase tracking-widest text-sm" id="rank-title"></p>
+                <div class="bg-panelDark p-5 rounded-2xl w-full border border-panelHover mb-8 shadow-inner text-left">
+                    <p class="text-sm text-textLight leading-relaxed"><span class="text-accentCyan font-bold">Present Perfect:</span> Recent news (has/have + V3).<br><span class="text-accentAmber font-bold">Past Simple:</span> Finished actions (in 2020).</p>
+                </div>
+                <button onclick="location.reload()" class="bg-panelHover border border-textMuted text-textMuted w-full py-4 rounded-xl font-bold font-heading tracking-widest uppercase">REBOOT SYSTEM</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Humans _____ to the Moon in 1972.", o: ["have gone", "went", "go"], a: 1 },
+            { q: "Breaking news! The astronauts _____ a new record!", o: ["broken", "have broken", "broke"], a: 1 },
+            { q: "We haven't seen a total eclipse _____ 1999.", o: ["for", "since", "in"], a: 1 },
+            { q: "They lost contact with the Earth _____ 40 minutes.", o: ["since", "for", "during"], a: 1 },
+            { q: "I _____ my keys yesterday. Have you seen them?", o: ["lose", "have lost", "lost"], a: 2 },
+            { q: "Wow, you look great! _____ you lost weight?", o: ["Have", "Did", "Do"], a: 0 },
+            { q: "The mission _____ a big success last year.", o: ["was", "has been", "is"], a: 0 },
+            { q: "She has been a scientist _____ she was a child.", o: ["since", "for", "when"], a: 0 },
+            { q: "_____ you ever seen a shooting star?", o: ["Did", "Have", "Were"], a: 1 },
+            { q: "I have lived in this city _____ three decades.", o: ["since", "for", "in"], a: 1 },
+            { q: "Neil Armstrong _____ the first man on the Moon.", o: ["has been", "was", "is"], a: 1 },
+            { q: "They _____ just fixed the engine problem!", o: ["did", "have", "are"], a: 1 },
+            { q: "When _____ the spacecraft launch?", o: ["did", "has", "have"], a: 0 },
+            { q: "I'm so happy! I _____ finally finished my report.", o: ["did", "am", "have"], a: 2 },
+            { q: "He studied astrophysics _____ five years.", o: ["for", "since", "during"], a: 0 }
+        ];
+
+        let currentQ = 0;
+        let score = 0;
+
+        function startQuiz() {
+            document.getElementById('screen-start').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            document.getElementById('screen-quiz').style.display = 'flex';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQ];
+            document.getElementById('q-counter').innerText = `Q ${currentQ + 1}/${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQ) / questions.length) * 100}%`;
+            document.getElementById('question-text').innerText = q.q;
+            
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            
+            q.o.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full bg-panelDark border border-panelHover text-left p-5 rounded-xl text-lg hover:border-accentCyan transition-colors';
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(idx, q.a, btn, optsContainer);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selected, correct, btn, container) {
+            Array.from(container.children).forEach(b => b.disabled = true);
+            
+            if (selected === correct) {
+                btn.classList.add('bg-accentCyan', 'border-accentCyan', 'text-bgDark', 'font-bold');
+                score++;
+            } else {
+                btn.classList.add('bg-dangerRed', 'border-dangerRed', 'text-textLight');
+                container.children[correct].classList.add('border-accentCyan', 'text-accentCyan');
+            }
+
+            setTimeout(() => {
+                currentQ++;
+                if (currentQ < questions.length) {
+                    document.getElementById('screen-quiz').classList.remove('fade-in');
+                    void document.getElementById('screen-quiz').offsetWidth; 
+                    document.getElementById('screen-quiz').classList.add('fade-in');
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }, 1200);
+        }
+
+        function showResults() {
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+            document.getElementById('screen-result').style.display = 'flex';
+            document.getElementById('progress-bar').style.width = '100%';
+            
+            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+            
+            let rank, icon;
+            if (score === 15) { rank = 'MISSION DIRECTOR'; icon = '<i class="fa-solid fa-rocket"></i>'; spawnConfetti(); }
+            else if (score >= 10) { rank = 'ASTRONAUT'; icon = '<i class="fa-solid fa-user-astronaut text-accentCyan"></i>'; }
+            else { rank = 'RADAR TECHNICIAN'; icon = '<i class="fa-solid fa-satellite-dish text-textMuted"></i>'; }
+            
+            document.getElementById('rank-title').innerText = rank;
+            document.getElementById('rank-icon').innerHTML = icon;
+        }
+
+        function spawnConfetti() {
+            const container = document.getElementById('screen-result');
+            const colors = ['#00F0FF', '#FFB000', '#F8FAFC'];
+            for(let i=0; i<40; i++) {
+                let conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + '%';
+                conf.style.animation = `fall ${Math.random() * 2 + 1}s linear forwards`;
+                conf.style.animationDelay = Math.random() * 2 + 's';
+                conf.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                container.appendChild(conf);
+            }
+        }
+    </script>
+</body>
+</html>
